@@ -73,6 +73,29 @@ function setupWorld() {
     camera.x = bird.x - SCREEN_WIDTH / 2;
     camera.y = bird.y - SCREEN_HEIGHT / 2;
 
+    
+    for (let x = SCREEN_WIDTH / 2; x < 3500; x += Math.random() * 100 + 100) {
+        let random = Math.round(Math.random() * 2);
+        for (let i = 0; i < random; i++) {
+            let size = Math.round(64 + Math.random() * 128);
+            world.objects.push({
+                name: 'cloud',
+                x: x,
+                y: Math.random() * -(500 + SCREEN_HEIGHT) + SCREEN_HEIGHT,
+                w: size,
+                h: size,
+                vx: Math.random() * 1 - .5,
+                vy: 0,
+                dir: Math.random() > 0.5 ? 1 : -1,
+                animation: 0,
+                frame: Math.floor(Math.random() * 6),
+                tw: 32,
+                th: 32,
+                collisions: [],
+            })
+        }
+    }
+
     // Add starting tree
     world.objects.push({
         name: 'tree',
@@ -100,7 +123,7 @@ function setupWorld() {
     // Add balcony
     balcony = {
         name: 'balcony',
-        x: 5400,
+        x: 3400,
         y: 300,
         w: 800,
         h: 600,
@@ -129,13 +152,13 @@ function setupWorld() {
     world.objects.push(balcony);
 
     // Lots of bees
-    for (let x = SCREEN_WIDTH / 2; x < 4000; x += Math.random() * 100 + 100) {
-        let random = Math.round(Math.random() * 3);
+    for (let x = SCREEN_WIDTH / 2; x < 3000; x += Math.random() * 100 + 100) {
+        let random = Math.round(Math.random() * 2);
         for (let i = 0; i < random; i++) {
             world.objects.push({
                 name: 'bee',
                 x: x,
-                y: Math.random() * -(1000 + SCREEN_HEIGHT) + SCREEN_HEIGHT,
+                y: Math.random() * -(500 + SCREEN_HEIGHT) + SCREEN_HEIGHT,
                 w: 64,
                 h: 64,
                 vx: 0,
@@ -183,11 +206,7 @@ function update(dt) {
         player.animation = 1;
         player.vx += 20 * dt;
     }
-    if ((isKeyPressed("ArrowUp") || isKeyPressed("Space")) && player.onGround && balcony.frame < 9) {
-        player.vy = -5;
-        player.vx = 5 * player.dir;
-    }
-
+ 
     if (!player.onGround) {
         if (Math.abs(player.vx) > 1) {
             player.animation = 2;
@@ -257,6 +276,11 @@ function update(dt) {
             }
         }
 
+        if (o.name == 'cloud') {
+            o.x += o.vx * dt;
+            o.y += o.vy * dt;
+        }
+
         if (o.name == 'bee') {
             o.vx -= 10 * o.dir * dt;
             if (o.x - o.pathX > o.pathWidth / 2) {
@@ -287,7 +311,7 @@ function update(dt) {
     let targetY = player.y - SCREEN_HEIGHT / 2;
 
     if (boss) {
-        targetX = 5500 - SCREEN_WIDTH / 2;
+        targetX = 3500 - SCREEN_WIDTH / 2;
         targetY = 300 - SCREEN_HEIGHT / 2;
 
         if (balcony.frame < 1) {
@@ -343,11 +367,11 @@ function update(dt) {
     if (camera.y > 0) {
         camera.y = 0;
     }
-    if (camera.x > 5000) {
-        camera.x = 5000;
+    if (camera.x > 3000) {
+        camera.x = 3000;
     }
-    if (camera.y < -1000) {
-        camera.y = -1000;
+    if (camera.y < -500) {
+        camera.y = -500;
     }
 }
 
@@ -358,7 +382,7 @@ function render(dt) {
     // Render background
     let bottom = [50, 150, 200];
     let top = [5, 15, 100];
-    let percent = camera.y / -1000;
+    let percent = camera.y / -500;
     let curr = [Math.round(bottom[0] + (top[0] - bottom[0]) * percent),
     Math.round(bottom[1] + (top[1] - bottom[1]) * percent),
     Math.round(bottom[2] + (top[2] - bottom[2]) * percent)]
@@ -425,6 +449,7 @@ promises.push(loadImage('bird', 'bird.png'));
 promises.push(loadImage('tree', 'tree.png'));
 promises.push(loadImage('balcony', 'balcony.png'));
 promises.push(loadImage('bee', 'bee.png'));
+promises.push(loadImage('cloud', 'cloud.png'));
 Promise.all(promises).then(() => {
     // Setup canvas
     setupCanvas();
