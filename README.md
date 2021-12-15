@@ -1,2 +1,2 @@
 # DadsBirthday
-https://canelex.github.io/DadsBirthday/index.html
+https://canelex.github.io/DadsBirthday
